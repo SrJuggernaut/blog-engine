@@ -1,10 +1,10 @@
-import { makeExecutableSchema } from 'graphql-tools'
-import typeDefs from './typeDefs'
-import resolvers from './resolvers'
+import { stitchSchemas } from '@graphql-tools/stitch'
+import userSchema from './user/userSchema'
 
-const schema = makeExecutableSchema({
-  typeDefs,
-  resolvers
+const schema = stitchSchemas({
+  subschemas: [
+    userSchema
+  ]
 })
 
 export default schema
