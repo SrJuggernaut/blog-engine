@@ -12,14 +12,18 @@ import {
 const USER = encodeURIComponent(dbUser)
 const PASSWORD = encodeURIComponent(dbPassword)
 
-const MONGO_URI = `mongodb${dbSrv}://${USER}:${PASSWORD}@${dbHost}:${dbPort}/${dbName}?authSource=${dbAuthSource}?retryWrite=true?w=majority`
+const MONGO_URI = `mongodb${dbSrv}://${USER}:${PASSWORD}@${dbHost}:${dbPort}/`
 
 class MongoLib {
   static connection: any
   client: MongoClient
   dbName: string
   constructor () {
-    this.client = new MongoClient(MONGO_URI, { useNewUrlParser: true })
+    this.client = new MongoClient(MONGO_URI, {
+      authSource: dbAuthSource,
+      retryWrites: true,
+      w: 'majority'
+    })
     this.dbName = dbName
   }
 
@@ -32,7 +36,7 @@ class MongoLib {
         await connection.db(dbName).command({ ping: 1 })
         console.log('Connected successfully to database')
         // set Connection
-        MongoLib.connection = connection
+        MongoLib.connection = connection.db(dbName)
       } catch (error) {
         console.error(error)
       }
@@ -50,7 +54,7 @@ class MongoLib {
     }
   }
 
-  async get (collection: string, id: string): Promise<object | void> {
+  async get (collection: string, id: ObjectId): Promise<any | void> {
     try {
       const db = await this.connect()
       const res = db.collection(collection).findOne({ _id: new ObjectId(id) })
@@ -60,11 +64,14 @@ class MongoLib {
     }
   }
 
-  async create (collection: string, data: object): Promise<string | void> {
+  async create (collection: string, data: object): Promise<ObjectId | void> {
     try {
       const db = await this.connect()
-      const res = db.collection(collection).insertOne(data)
-      return res.insertedID
+      const res = await db
+        .collection(collection)
+        .insertOne(data, { raw: true })
+      console.log('MongoLib', res)
+      return res.insertedId
     } catch (error) {
       console.error(error)
     }
@@ -101,4 +108,4 @@ class MongoLib {
   }
 }
 
-module.exports = MongoLib
+export default MongoLib

@@ -5,7 +5,7 @@ const userTypeDefs = `
   type Mutation {
     register(user: userRegister!): user
     login(credentials: userLogin): logedInUser
-    updateUser(user: user):user
+    updateUser(id: ID!, user: userUpdate):user
   }
   input userRegister {
     userName: String!
@@ -19,6 +19,11 @@ const userTypeDefs = `
   }
   type user {
     id: ID
+    userName: String
+    email: String
+    description: String
+  }
+  input userUpdate {
     userName: String
     email: String
     description: String

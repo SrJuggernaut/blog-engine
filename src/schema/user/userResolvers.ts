@@ -1,3 +1,8 @@
+import { ObjectId } from 'bson'
+import UserServices from '../../services/UserServices'
+
+const userServices = new UserServices()
+
 const useResolvers = {
   Query: {
     user: () => ({
@@ -9,10 +14,13 @@ const useResolvers = {
     })
   },
   Mutation: {
-    register: (root: any, args: { user: any }, context: any) => {
-      return {
-        id: 444,
-        ...args.user
+    register: async (root: any, args: { user: any }, context: any) => {
+      try {
+        const res = (await userServices.register(args.user)) as ObjectId
+        console.log('userResolvers', res.toHexString())
+        return { id: res.toHexString() }
+      } catch (error) {
+        console.log(error)
       }
     },
     login: (root: any, args: { credentials: any }, context: any) => {
