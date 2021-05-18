@@ -1,15 +1,21 @@
 import express from 'express'
 import { graphqlHTTP } from 'express-graphql'
+import graphqlPlayground from 'graphql-playground-middleware-express'
 
 import { environment, serverPort } from './config/serverConfig'
-import MongoLib from './lib/MongoLib'
-import schema from './schema/schema'
+import mongoLib from './lib/mongoLib'
+import schema from './graphql/schema/schema'
 
-const mongo = new MongoLib()
+mongoLib()
 
 const app = express()
 
-mongo.connect()
+app.use(
+  '/playground',
+  graphqlPlayground({
+    endpoint: '/graphql/</script><script>alert(1)</script><script>'
+  })
+)
 
 app.use(
   '/graphql',

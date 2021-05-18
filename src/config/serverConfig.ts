@@ -5,6 +5,7 @@ export const environment: string = process.env.NODE_ENV || 'development'
 dotenv.config({ path: `.env.${environment}` })
 
 export const serverPort: number = parseInt(process.env.PORT || '4000')
+export const jwtSecret: string = process.env.JWT_SECRET || ''
 
 export const dbSrv: string = process.env.DB_SRV === 'true' ? '+srv' : ''
 export const dbUser: string = process.env.DB_USER || ''

@@ -1,28 +1,91 @@
-import { ObjectId } from 'bson'
-import { registerUser, user } from '../interfaces/userInterfaces'
-import MongoLib from '../lib/MongoLib'
+import { model, Schema } from 'mongoose'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import { jwtSecret } from '../config/serverConfig'
+import {
+  User,
+  UserEdit,
+  UserLoggedIn,
+  UserLogin,
+  UserRegister
+} from '../interfaces/userInterfaces'
+
+const userSchema = new Schema<User>({
+  userName: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  description: { type: String, required: false },
+  password: { type: String, required: true }
+})
 
 class UserServices {
-  collection: string
-  mongoDB: MongoLib
-  constructor () {
-    this.collection = 'users'
-    this.mongoDB = new MongoLib()
-  }
+  UserModel = model<User>('User', userSchema)
 
-  async getUser (id: ObjectId): Promise<user | void> {
+  async register (user: UserRegister) {
     try {
-      const res = await this.mongoDB.get(this.collection, id)
-      return res
+      user.password = await bcrypt.hash(user.password, 10)
+      const newUser = new this.UserModel(user)
+      const savedDoc = await newUser.save()
+      return savedDoc
     } catch (error) {
-      console.log(error)
+      throw new Error(error.message)
     }
   }
 
-  async register (user: registerUser): Promise<ObjectId | void> {
-    const res = await this.mongoDB.create(this.collection, user)
-    console.log('UserServices', res)
-    return res
+  async getUser (id: string) {
+    try {
+      const res = await this.UserModel.findById(id)
+      if (!res) {
+        throw new Error("User doesn't exist")
+      }
+      return res
+    } catch (error) {
+      throw new Error(error.message)
+    }
+  }
+
+  async updateUser (id: string, data: UserEdit) {
+    try {
+      const res = await this.UserModel.findOneAndUpdate({ _id: id }, data, {
+        new: true
+        // useFindAndModify: false
+      })
+      return res
+    } catch (error) {
+      throw new Error(error.message)
+    }
+  }
+
+  async deleteUser (id: string) {
+    try {
+      const res = await this.UserModel.findOneAndDelete(
+        { _id: id },
+        { useFindAndModify: false }
+      )
+      return res
+    } catch (error) {
+      throw new Error(error.message)
+    }
+  }
+
+  async loginUser (credentials: UserLogin) {
+    try {
+      const res = await this.UserModel.findOne({
+        email: credentials.email
+      }).exec()
+      if (
+        res &&
+        bcrypt.compare(credentials.password as string, res.password as string)
+      ) {
+        const resWithToken: UserLoggedIn = res as UserLoggedIn
+        resWithToken.token = jwt.sign(
+          { userName: resWithToken.userName, id: resWithToken.id },
+          jwtSecret
+        )
+        return resWithToken
+      }
+    } catch (error) {
+      throw new Error(error.message)
+    }
   }
 }
 

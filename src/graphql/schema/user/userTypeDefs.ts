@@ -6,6 +6,7 @@ const userTypeDefs = `
     register(user: userRegister!): user
     login(credentials: userLogin): logedInUser
     updateUser(id: ID!, user: userUpdate):user
+    deleteUser(id:ID!):user
   }
   input userRegister {
     userName: String!
