@@ -17,76 +17,69 @@ const userSchema = new Schema<User>({
   password: { type: String, required: true }
 })
 
-class UserServices {
-  UserModel = model<User>('User', userSchema)
+const UserModel = model<User>('User', userSchema)
 
-  async register (user: UserRegister) {
-    try {
-      user.password = await bcrypt.hash(user.password, 10)
-      const newUser = new this.UserModel(user)
-      const savedDoc = await newUser.save()
-      return savedDoc
-    } catch (error) {
-      throw new Error(error.message)
-    }
-  }
-
-  async getUser (id: string) {
-    try {
-      const res = await this.UserModel.findById(id)
-      if (!res) {
-        throw new Error("User doesn't exist")
-      }
-      return res
-    } catch (error) {
-      throw new Error(error.message)
-    }
-  }
-
-  async updateUser (id: string, data: UserEdit) {
-    try {
-      const res = await this.UserModel.findOneAndUpdate({ _id: id }, data, {
-        new: true
-        // useFindAndModify: false
-      })
-      return res
-    } catch (error) {
-      throw new Error(error.message)
-    }
-  }
-
-  async deleteUser (id: string) {
-    try {
-      const res = await this.UserModel.findOneAndDelete(
-        { _id: id },
-        { useFindAndModify: false }
-      )
-      return res
-    } catch (error) {
-      throw new Error(error.message)
-    }
-  }
-
-  async loginUser (credentials: UserLogin) {
-    try {
-      const res = await this.UserModel.findOne({
-        email: credentials.email
-      }).exec()
-      if (
-        res &&
-        bcrypt.compare(credentials.password as string, res.password as string)
-      ) {
-        const resWithToken: UserLoggedIn = res as UserLoggedIn
-        resWithToken.token = jwt.sign(
-          { userName: resWithToken.userName, id: resWithToken.id },
-          jwtSecret
-        )
-        return resWithToken
-      }
-    } catch (error) {
-      throw new Error(error.message)
-    }
+const register = async (user: UserRegister) => {
+  try {
+    user.password = await bcrypt.hash(user.password, 10)
+    const newUser = new UserModel(user)
+    const savedDoc = await newUser.save()
+    return savedDoc
+  } catch (error) {
+    throw new Error(error.message)
   }
 }
 
-export default UserServices
+const getUser = async (id: string) => {
+  try {
+    const res = await UserModel.findById(id)
+    if (!res) {
+      throw new Error("User doesn't exist")
+    }
+    return res
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
+const updateUser = async (id: string, data: UserEdit) => {
+  try {
+    const res = await UserModel.findOneAndUpdate({ _id: id }, data, {
+      new: true
+    })
+    return res
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
+const deleteUser = async (id: string) => {
+  try {
+    const res = await UserModel.findOneAndDelete({ _id: id })
+    return res
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
+const loginUser = async (credentials: UserLogin) => {
+  try {
+    const res = await UserModel.findOne({
+      email: credentials.email
+    }).exec()
+    if (
+      res &&
+      bcrypt.compare(credentials.password as string, res.password as string)
+    ) {
+      const resWithToken: UserLoggedIn = res as UserLoggedIn
+      resWithToken.token = jwt.sign(
+        { userName: resWithToken.userName, id: resWithToken.id },
+        jwtSecret
+      )
+      return resWithToken
+    }
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+export { register, getUser, updateUser, deleteUser, loginUser }

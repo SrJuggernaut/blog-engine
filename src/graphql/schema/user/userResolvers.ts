@@ -4,15 +4,19 @@ import {
   userRegisterSchema,
   UserLogin
 } from '../../../interfaces/userInterfaces'
-import UserServices from '../../../services/UserServices'
-
-const userServices = new UserServices()
+import {
+  getUser,
+  register,
+  loginUser,
+  updateUser,
+  deleteUser
+} from '../../../services/UserServices'
 
 const useResolvers = {
   Query: {
     user: async (root: any, args: { id: string }, context: any) => {
       try {
-        const res = await userServices.getUser(args.id)
+        const res = await getUser(args.id)
         return res
       } catch (error) {
         throw new Error(error.message)
@@ -26,31 +30,39 @@ const useResolvers = {
         return error
       }
       try {
-        const res = await userServices.register(value)
+        const res = await register(value)
         return res
       } catch (error) {
         throw new Error(error.message)
       }
     },
-    login: async (root: any, args: { credentials: UserLogin }, context: any) => {
+    login: async (
+      root: any,
+      args: { credentials: UserLogin },
+      context: any
+    ) => {
       try {
-        const res = await userServices.loginUser(args.credentials)
+        const res = await loginUser(args.credentials)
         return res
       } catch (error) {
         throw new Error(error.message)
       }
     },
-    updateUser: async (root: any, args: { id: string, user: UserEdit }, context: any) => {
+    updateUser: async (
+      root: any,
+      args: { id: string; user: UserEdit },
+      context: any
+    ) => {
       try {
-        const res = await userServices.updateUser(args.id, args.user)
+        const res = await updateUser(args.id, args.user)
         return res
       } catch (error) {
         throw new Error(error.message)
       }
     },
-    deleteUser: async (root: any, args: { id: string}, context: any) => {
+    deleteUser: async (root: any, args: { id: string }, context: any) => {
       try {
-        const res = await userServices.deleteUser(args.id)
+        const res = await deleteUser(args.id)
         return res
       } catch (error) {
         throw new Error(error.message)
