@@ -1,10 +1,10 @@
 const userTypeDefs = `
   type Query {
-    user(id: ID!): user
+    me: user
   }
   type Mutation {
-    register(user: userRegister!): user
-    login(credentials: userLogin): logedInUser
+    register(user: userRegister!): loggedInUser
+    login(credentials: userLogin): loggedInUser
     updateUser(id: ID!, user: userUpdate):user
     deleteUser(id:ID!):user
   }
@@ -29,7 +29,7 @@ const userTypeDefs = `
     email: String
     description: String
   }
-  type logedInUser {
+  type loggedInUser {
     id: ID
     token: String!
     userName: String

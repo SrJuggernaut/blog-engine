@@ -14,7 +14,7 @@ import {
 
 const useResolvers = {
   Query: {
-    user: async (root: any, args: { id: string }, context: any) => {
+    me: async (root: any, args: { id: string }, context: any) => {
       try {
         const res = await getUser(args.id)
         return res

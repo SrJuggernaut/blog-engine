@@ -1,7 +1,5 @@
 import { model, Schema } from 'mongoose'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import { jwtSecret } from '../config/serverConfig'
+import { genJWT, genHash, compHash } from '../lib/authLib'
 import {
   User,
   UserEdit,
@@ -21,7 +19,7 @@ const UserModel = model<User>('User', userSchema)
 
 const register = async (user: UserRegister) => {
   try {
-    user.password = await bcrypt.hash(user.password, 10)
+    user.password = await genHash(user.password)
     const newUser = new UserModel(user)
     const savedDoc = await newUser.save()
     return savedDoc
@@ -69,13 +67,10 @@ const loginUser = async (credentials: UserLogin) => {
     }).exec()
     if (
       res &&
-      bcrypt.compare(credentials.password as string, res.password as string)
+      compHash(credentials.password as string, res.password as string)
     ) {
       const resWithToken: UserLoggedIn = res as UserLoggedIn
-      resWithToken.token = jwt.sign(
-        { userName: resWithToken.userName, id: resWithToken.id },
-        jwtSecret
-      )
+      resWithToken.token = genJWT({ id: resWithToken.id })
       return resWithToken
     }
   } catch (error) {
