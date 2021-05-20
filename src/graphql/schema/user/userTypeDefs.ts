@@ -1,35 +1,35 @@
 const userTypeDefs = `
   type Query {
-    me: user
+    me: User
   }
   type Mutation {
-    register(user: userRegister!): loggedInUser
-    login(credentials: userLogin): loggedInUser
-    updateUser(id: ID!, user: userUpdate):user
-    deleteUser(id:ID!):user
+    register(user: UserRegister!): UserLoggedIn
+    login(credentials: UserLogin): UserLoggedIn
+    updateUser(id: ID!, user: UserEdit):User
+    deleteUser(id:ID!):User
   }
-  input userRegister {
-    userName: String!
-    email: String!
-    password: String!
-    description: String
-  }
-  input userLogin {
-    email: String!
-    password: String!
-  }
-  type user {
+  type User {
     id: ID
     userName: String
     email: String
     description: String
   }
-  input userUpdate {
+  input UserRegister {
+    userName: String!
+    email: String!
+    password: String!
+    description: String
+  }
+  input UserLogin {
+    email: String!
+    password: String!
+  }
+  input UserEdit {
     userName: String
     email: String
     description: String
   }
-  type loggedInUser {
+  type UserLoggedIn {
     id: ID
     token: String!
     userName: String

@@ -6,11 +6,15 @@ import { veriJWT } from './lib/authLib'
 
 const server = new ApolloServer({
   schema,
+  tracing: true,
   playground: environment === 'development',
   context: ({ req }) => {
-    const token = req.headers.authorization || ''
-    const data = veriJWT(token)
-    return { data }
+    if (req.headers.authorization) {
+      const token = req.headers.authorization || ''
+      const { id } = veriJWT(token)
+      return { id }
+    }
+    return null
   }
 })
 

@@ -31,6 +31,9 @@ export interface UserLoggedIn {
   email: User['email']
   description: User['description']
 }
+export interface JWTPayload {
+  id: string
+}
 export const userSchema = Joi.object({
   id: Joi.string()
     .alphanum()
