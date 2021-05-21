@@ -4,9 +4,11 @@ import {
   UserRegister,
   UserEdit,
   userRegisterSchema,
-  UserLoginSchema,
-  UserLogin
+  userLoginSchema,
+  UserLogin,
+  userEditSchema
 } from '../../../interfaces/userInterfaces'
+import { getPosts } from '../../../services/postServices'
 import {
   getUser,
   register,
@@ -48,9 +50,9 @@ const useResolvers = {
       args: { credentials: UserLogin },
       context: any
     ) => {
-      const { error, value } = UserLoginSchema.validate(args.credentials)
+      const { error, value } = userLoginSchema.validate(args.credentials)
       if (error) {
-        throw new UserInputError(error.message, {})
+        throw new UserInputError(error.message)
       }
       try {
         const res = await loginUser(value)
@@ -64,11 +66,15 @@ const useResolvers = {
       args: { id: string; user: UserEdit },
       context: any
     ) => {
+      const { error, value } = userEditSchema.validate(args.user)
+      if (error) {
+        throw new UserInputError(error.message)
+      }
       if (!context.id || context.id !== args.id) {
-        throw new ForbiddenError('You can\'t modify that user')
+        throw new ForbiddenError("You can't modify that user")
       }
       try {
-        const res = await updateUser(args.id, args.user)
+        const res = await updateUser(args.id, value)
         return res
       } catch (error) {
         throw new Error(error.message)
@@ -76,7 +82,7 @@ const useResolvers = {
     },
     deleteUser: async (root: any, args: { id: string }, context: any) => {
       if (!context.id || context.id !== args.id) {
-        throw new ForbiddenError('You can\'t delete that user')
+        throw new ForbiddenError("You can't delete that user")
       }
       try {
         const res = await deleteUser(args.id)
@@ -85,6 +91,10 @@ const useResolvers = {
         throw new Error(error.message)
       }
     }
+  },
+  User: {
+    id: (user: any) => user.id.toString(),
+    posts: (user: any) => getPosts({ author: user.id.toString() })
   }
 }
 

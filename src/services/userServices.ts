@@ -19,7 +19,6 @@ const userSchema = new Schema<User>({
 const UserModel = model<User>('User', userSchema)
 
 const register = async (user: UserRegister) => {
-  console.log('user', user)
   try {
     user.password = await genHash(user.password)
     const newUser = new UserModel(user)

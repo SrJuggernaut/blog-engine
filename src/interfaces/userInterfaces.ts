@@ -8,21 +8,25 @@ export interface User {
   password?: string
   description?: string
 }
+
 export interface UserRegister {
   userName: User['userName']
   email: User['email']
   password: string
   description?: User['description']
 }
+
 export interface UserLogin {
   email: User['email']
   password: UserRegister['password']
 }
+
 export interface UserEdit {
   userName?: string
   email?: string
   description?: string
 }
+
 export interface UserLoggedIn {
   id: User['id']
   userName: User['userName']
@@ -31,9 +35,11 @@ export interface UserLoggedIn {
   email: User['email']
   description: User['description']
 }
+
 export interface JWTPayload {
   id: string
 }
+
 export const userSchema = Joi.object({
   id: Joi.string()
     .alphanum()
@@ -43,15 +49,29 @@ export const userSchema = Joi.object({
   email: Joi.string().email().required(),
   description: Joi.string()
 })
+
 export const userRegisterSchema = Joi.object({
   userName: Joi.string().alphanum().min(3).required(),
   email: Joi.string().email().required(),
-  password: Joi.string().pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/).required().messages({
-    'string.pattern.base': 'The password must contain at least one number and one capital letter'
-  }),
+  password: Joi.string()
+    .pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)
+    .required()
+    .messages({
+      'string.pattern.base':
+        'The password must contain at least one number and one capital letter'
+    }),
   description: Joi.string()
 })
-export const UserLoginSchema = Joi.object({
+
+export const userLoginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)
 })
+
+export const userEditSchema = Joi.object({
+  userName: Joi.string().alphanum().min(3),
+  email: Joi.string().email(),
+  description: Joi.string()
+})
+  .min(1)
+  .messages({ 'object.min': "User can't be empty" })

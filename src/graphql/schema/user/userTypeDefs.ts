@@ -13,6 +13,7 @@ const userTypeDefs = `
     userName: String
     email: String
     description: String
+    posts: [Post]
   }
   input UserRegister {
     userName: String!
