@@ -8,7 +8,7 @@ import {
   dbHost,
   dbAuthSource,
   dbPort
-} from '../config/serverConfig'
+} from '@config/serverConfig'
 
 const USER = encodeURIComponent(dbUser)
 const PASSWORD = encodeURIComponent(dbPassword)

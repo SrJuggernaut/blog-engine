@@ -1,6 +1,6 @@
 import { Schema, model, Error } from 'mongoose'
 
-import { CreatePost, EditPost, Post } from '../interfaces/postInterfaces'
+import { CreatePost, EditPost, Post } from '@interfaces/postInterfaces'
 
 const postSchema = new Schema<Post>({
   title: { type: String, required: true, unique: true },

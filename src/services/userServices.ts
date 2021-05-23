@@ -1,13 +1,13 @@
 import { model, Schema } from 'mongoose'
 import { AuthenticationError } from 'apollo-server'
-import { genJWT, genHash, compHash } from '../lib/authLib'
+import { genJWT, genHash, compHash } from '@lib/authLib'
 import {
   User,
   UserEdit,
   UserLoggedIn,
   UserLogin,
   UserRegister
-} from '../interfaces/userInterfaces'
+} from '@interfaces/userInterfaces'
 
 const userSchema = new Schema<User>({
   userName: { type: String, required: true, unique: true },
