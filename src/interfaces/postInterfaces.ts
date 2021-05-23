@@ -22,12 +22,12 @@ export interface CreatePost {
 }
 
 export interface EditPost {
-  title: Post['title']
-  slug: Post['slug']
-  excerpt: Post['excerpt']
+  title?: Post['title']
+  slug?: Post['slug']
+  excerpt?: Post['excerpt']
   seoTitle?: Post['seoTitle']
   seoDescription?: Post['seoDescription']
-  author: Post['author']
+  author?: Post['author']
 }
 
 export interface QueryPost {
@@ -82,7 +82,9 @@ export const editPostSchema = Joi.object({
   seoTitle: Joi.string(),
   seoDescription: Joi.string(),
   author: Joi.string().pattern(/^[a-f\d]{24}$/i)
-}).min(1)
+}).min(1).messages({
+  'object.min': '"post" must have at least 1 key to edit'
+})
 
 export const queryPostSchema = Joi.object({
   author: Joi.string()

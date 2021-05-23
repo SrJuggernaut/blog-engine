@@ -13,7 +13,6 @@ const genHash = async (password: string) => {
 
 const compHash = async (password: string, hash: string) => {
   const match: boolean = await bcrypt.compare(password, hash)
-  console.log('password match', match)
   return match
 }
 

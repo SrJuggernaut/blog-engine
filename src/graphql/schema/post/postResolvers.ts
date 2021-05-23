@@ -3,6 +3,7 @@ import {
   CreatePost,
   createPostSchema,
   EditPost,
+  editPostSchema,
   queryPostSchema
 } from '../../../interfaces/postInterfaces'
 import {
@@ -52,10 +53,11 @@ const postResolvers = {
     },
     editPost: async (
       root: any,
-      args: { id: string; data: EditPost },
+      args: { id: string; post: EditPost },
       context: any
     ) => {
-      const { error, value } = createPostSchema.validate(args.data)
+      const { error, value } = editPostSchema.validate(args.post)
+      console.log(args.post)
       if (error) {
         throw new UserInputError(error.message)
       }

@@ -1,6 +1,6 @@
 import { Schema, model, Error } from 'mongoose'
 
-import { CreatePost, Post } from '../interfaces/postInterfaces'
+import { CreatePost, EditPost, Post } from '../interfaces/postInterfaces'
 
 const postSchema = new Schema<Post>({
   title: { type: String, required: true, unique: true },
@@ -26,6 +26,9 @@ export const createPost = async (post: CreatePost) => {
 export const getPost = async (id: string) => {
   try {
     const post = await PostModel.findById(id)
+    if (!post) {
+      throw new Error("Post doesn't exist")
+    }
     return post
   } catch (error) {
     throw new Error(error.message)
@@ -35,17 +38,23 @@ export const getPost = async (id: string) => {
 export const getPosts = async (filter: any) => {
   try {
     const posts = await PostModel.find(filter)
+    if (!posts) {
+      throw new Error('Unable to get the list of posts')
+    }
     return posts
   } catch (error) {
     throw new Error(error.message)
   }
 }
 
-export const editPost = async (id: string, data: any) => {
+export const editPost = async (id: string, data: EditPost) => {
   try {
     const editedPost = await PostModel.findOneAndUpdate({ _id: id }, data, {
       new: true
     })
+    if (!editedPost) {
+      throw new Error("Post doesn't exist")
+    }
     return editedPost
   } catch (error) {
     throw new Error(error.message)
@@ -54,5 +63,8 @@ export const editPost = async (id: string, data: any) => {
 
 export const deletePost = async (id: string) => {
   const deletedPost = await PostModel.findOneAndDelete({ _id: id })
+  if (!deletedPost) {
+    throw new Error("Post doesn't exist")
+  }
   return deletedPost
 }

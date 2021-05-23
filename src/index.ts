@@ -1,6 +1,6 @@
 import { ApolloServer } from 'apollo-server'
 import { environment, serverPort } from './config/serverConfig'
-import mongoLib from './lib/mongoLib'
+import { start } from './lib/mongoLib'
 import schema from './graphql/schema/schema'
 import { veriJWT } from './lib/authLib'
 
@@ -18,6 +18,8 @@ const server = new ApolloServer({
   }
 })
 
+start()
+
 server
   .listen({
     port: serverPort
@@ -25,5 +27,3 @@ server
   .then(({ url }) => {
     console.log(`🚀  Server ready at ${url}`)
   })
-
-mongoLib()

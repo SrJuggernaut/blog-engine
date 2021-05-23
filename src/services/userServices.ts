@@ -18,65 +18,74 @@ const userSchema = new Schema<User>({
 
 const UserModel = model<User>('User', userSchema)
 
-const register = async (user: UserRegister) => {
+export const register = async (user: UserRegister) => {
   try {
     user.password = await genHash(user.password)
     const newUser = new UserModel(user)
-    const savedDoc: any = await newUser.save()
-    savedDoc.token = genJWT({ id: savedDoc.id })
-    return savedDoc
+    const savedUser: any = await newUser.save()
+    savedUser.token = genJWT({ id: savedUser.id })
+    return savedUser
   } catch (error) {
     throw new Error(error.message)
   }
 }
 
-const getUser = async (id: string) => {
+export const getUser = async (id: string) => {
   try {
-    const res = await UserModel.findById(id)
-    if (!res) {
+    const user = await UserModel.findById(id).exec()
+    if (!user) {
       throw new Error("User doesn't exist")
     }
-    return res
+    return user
   } catch (error) {
     throw new Error(error.message)
   }
 }
 
-const updateUser = async (id: string, data: UserEdit) => {
+export const updateUser = async (id: string, data: UserEdit) => {
   try {
-    const res = await UserModel.findOneAndUpdate({ _id: id }, data, {
+    const updatedUser = await UserModel.findOneAndUpdate({ _id: id }, data, {
       new: true
     })
-    return res
+    if (!updatedUser) {
+      throw new Error("User doesn't exist or can't be edited")
+    }
+    return updatedUser
   } catch (error) {
     throw new Error(error.message)
   }
 }
 
-const deleteUser = async (id: string) => {
+export const deleteUser = async (id: string) => {
   try {
-    const res = await UserModel.findOneAndDelete({ _id: id })
-    return res
+    const deletedUser = await UserModel.findOneAndDelete({ _id: id })
+    if (!deletedUser) {
+      throw new Error("User doesn't exist")
+    }
+    return deletedUser
   } catch (error) {
     throw new Error(error.message)
   }
 }
 
-const loginUser = async (credentials: UserLogin) => {
+export const loginUser = async (credentials: UserLogin) => {
   try {
-    const res = await UserModel.findOne({
+    const loggedInUser = await UserModel.findOne({
       email: credentials.email
     }).exec()
-    if (res) {
-      if (await compHash(credentials.password as string, res.password as string)) {
-        const resWithToken: UserLoggedIn = res as UserLoggedIn
-        resWithToken.token = genJWT({ id: resWithToken.id })
-        return resWithToken
+    if (loggedInUser) {
+      if (
+        await compHash(credentials.password as string, loggedInUser.password as string)
+      ) {
+        const loggedInUserWithToken: UserLoggedIn = loggedInUser as UserLoggedIn
+        loggedInUserWithToken.token = genJWT({ id: loggedInUserWithToken.id })
+        return loggedInUserWithToken
       }
     }
-    throw new AuthenticationError('Can\'t find user with that email/password combination')
+    throw new AuthenticationError(
+      "Can't find user with that email/password combination"
+    )
   } catch (error) {
     throw new Error(error.message)
   }
 }
-export { register, getUser, updateUser, deleteUser, loginUser }

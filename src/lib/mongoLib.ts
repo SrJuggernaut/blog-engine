@@ -1,5 +1,6 @@
-import { connect } from 'mongoose'
+import { connect, connection } from 'mongoose'
 import {
+  environment,
   dbSrv,
   dbUser,
   dbPassword,
@@ -14,7 +15,7 @@ const PASSWORD = encodeURIComponent(dbPassword)
 
 const MONGO_URI = `mongodb${dbSrv}://${USER}:${PASSWORD}@${dbHost}:${dbPort}/${dbName}`
 
-const mongoLib = async () => {
+export const start = async () => {
   try {
     await connect(MONGO_URI, {
       useNewUrlParser: true,
@@ -23,10 +24,14 @@ const mongoLib = async () => {
       useCreateIndex: true,
       useFindAndModify: false
     })
-    console.log('Successfully connected to MongoDB')
+    if (environment === 'development') {
+      console.log('Successfully connected to MongoDB')
+    }
   } catch (error) {
     console.log(error)
   }
 }
 
-export default mongoLib
+export const stop = async () => {
+  await connection.close()
+}
