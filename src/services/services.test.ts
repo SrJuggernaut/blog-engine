@@ -1,4 +1,4 @@
-import { start, stop } from '../lib/mongoLib'
+import { start, stop } from '@lib/mongoLib'
 import {
   deleteUser,
   getUser,
@@ -6,7 +6,7 @@ import {
   register,
   updateUser
 } from './userServices'
-import { generatePerson } from '../mocks/userMock'
+import { generatePerson } from '@mocks/userMock'
 import {
   createPost,
   deletePost,
@@ -14,7 +14,7 @@ import {
   getPost,
   getPosts
 } from './postServices'
-import { generatePost } from '../mocks/postMocks'
+import { generatePost } from '@mocks/postMocks'
 
 beforeAll(() => {
   start()

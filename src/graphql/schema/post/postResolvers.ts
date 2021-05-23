@@ -5,15 +5,15 @@ import {
   EditPost,
   editPostSchema,
   queryPostSchema
-} from '../../../interfaces/postInterfaces'
+} from '@interfaces/postInterfaces'
 import {
   createPost,
   deletePost,
   editPost,
   getPost,
   getPosts
-} from '../../../services/postServices'
-import { getUser } from '../../../services/userServices'
+} from '@services/postServices'
+import { getUser } from '@services/userServices'
 
 const postResolvers = {
   Query: {

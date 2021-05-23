@@ -7,15 +7,15 @@ import {
   userLoginSchema,
   UserLogin,
   userEditSchema
-} from '../../../interfaces/userInterfaces'
-import { getPosts } from '../../../services/postServices'
+} from '@interfaces/userInterfaces'
+import { getPosts } from '@services/postServices'
 import {
   getUser,
   register,
   loginUser,
   updateUser,
   deleteUser
-} from '../../../services/userServices'
+} from '@services/userServices'
 
 const useResolvers = {
   Query: {

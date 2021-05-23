@@ -1,8 +1,8 @@
 import { ApolloServer } from 'apollo-server'
-import { environment, serverPort } from './config/serverConfig'
-import { start } from './lib/mongoLib'
-import schema from './graphql/schema/schema'
-import { veriJWT } from './lib/authLib'
+import { environment, serverPort } from '@config/serverConfig'
+import { start } from '@lib/mongoLib'
+import schema from '@graphql/schema/schema'
+import { veriJWT } from '@lib/authLib'
 
 const server = new ApolloServer({
   schema,
