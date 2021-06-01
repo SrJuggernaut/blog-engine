@@ -11,31 +11,31 @@ import {
 } from './serverConfig'
 
 describe('Test env variables', () => {
-  test('NODE_ENV to be "test"', () => {
+  test('environment to be "test"', () => {
     expect(environment).toBe('test')
   })
-  test('server port is defined', () => {
+  test('serverPort to be PORT', () => {
     expect(serverPort).toBe(parseInt(process.env.PORT || '4000'))
   })
-  test('database in srv DNS', () => {
+  test('dbSrv to be DB_SRV', () => {
     expect(dbSrv).toBe(process.env.DB_SRV === 'true' ? '+srv' : '')
   })
-  test('database user is defined', () => {
+  test('dbUser to be DB_USER', () => {
     expect(dbUser).toBe(process.env.DB_USER)
   })
-  test('database password is defined', () => {
+  test('dbPassword to be DB_PASSWORD', () => {
     expect(dbPassword).toBe(process.env.DB_PASSWORD)
   })
-  test('database name is defined', () => {
+  test('dbName to be DB_NAME', () => {
     expect(dbName).toBe(process.env.DB_NAME)
   })
-  test('database host is defined', () => {
+  test('dbHost to be DB_HOST', () => {
     expect(dbHost).toBe(process.env.DB_HOST)
   })
-  test('database authentication source is defined', () => {
+  test('dbAuthSource to be DB_AUTH_SOURCE', () => {
     expect(dbAuthSource).toBe(process.env.DB_AUTH_SOURCE)
   })
-  test('database port is defined', () => {
+  test('dbPort to be DB_PORT', () => {
     expect(dbPort).toBe(process.env.DB_PORT)
   })
 })

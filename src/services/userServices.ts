@@ -1,13 +1,6 @@
 import { model, Schema } from 'mongoose'
-import { AuthenticationError } from 'apollo-server'
-import { genJWT, genHash, compHash } from '@lib/authLib'
-import {
-  User,
-  UserEdit,
-  UserLoggedIn,
-  UserLogin,
-  UserRegister
-} from '@interfaces/userInterfaces'
+import { User, UserEdit, UserQuery } from '@interfaces/userInterfaces'
+import { SignUpData } from '@interfaces/authInterfaces'
 
 const userSchema = new Schema<User>({
   userName: { type: String, required: true, unique: true },
@@ -18,73 +11,53 @@ const userSchema = new Schema<User>({
 
 const UserModel = model<User>('User', userSchema)
 
-export const register = async (user: UserRegister) => {
+export const createUser = async (user: SignUpData) => {
   try {
-    user.password = await genHash(user.password)
-    const newUser = new UserModel(user)
-    const savedUser: any = await newUser.save()
-    savedUser.token = genJWT({ id: savedUser.id })
+    const modeledUser = new UserModel(user)
+    const savedUser: any = await modeledUser.save()
+    delete savedUser.password
     return savedUser
   } catch (error) {
     throw new Error(error.message)
   }
 }
 
-export const getUser = async (id: string) => {
+export const getUser = async (query: UserQuery) => {
   try {
-    const user = await UserModel.findById(id).exec()
+    const user = await UserModel.findOne(query)
     if (!user) {
       throw new Error("User doesn't exist")
     }
+    delete user.password
     return user
   } catch (error) {
     throw new Error(error.message)
   }
 }
 
-export const updateUser = async (id: string, data: UserEdit) => {
+export const updateUser = async (query: UserQuery, data: UserEdit) => {
   try {
-    const updatedUser = await UserModel.findOneAndUpdate({ _id: id }, data, {
+    const updatedUser = await UserModel.findOneAndUpdate(query, data, {
       new: true
     })
     if (!updatedUser) {
       throw new Error("User doesn't exist or can't be edited")
     }
+    delete updatedUser.password
     return updatedUser
   } catch (error) {
     throw new Error(error.message)
   }
 }
 
-export const deleteUser = async (id: string) => {
+export const deleteUser = async (query: UserQuery) => {
   try {
-    const deletedUser = await UserModel.findOneAndDelete({ _id: id })
+    const deletedUser = await UserModel.findOneAndDelete(query)
     if (!deletedUser) {
       throw new Error("User doesn't exist")
     }
+    delete deletedUser.password
     return deletedUser
-  } catch (error) {
-    throw new Error(error.message)
-  }
-}
-
-export const loginUser = async (credentials: UserLogin) => {
-  try {
-    const loggedInUser = await UserModel.findOne({
-      email: credentials.email
-    }).exec()
-    if (loggedInUser) {
-      if (
-        await compHash(credentials.password as string, loggedInUser.password as string)
-      ) {
-        const loggedInUserWithToken: UserLoggedIn = loggedInUser as UserLoggedIn
-        loggedInUserWithToken.token = genJWT({ id: loggedInUserWithToken.id })
-        return loggedInUserWithToken
-      }
-    }
-    throw new AuthenticationError(
-      "Can't find user with that email/password combination"
-    )
   } catch (error) {
     throw new Error(error.message)
   }

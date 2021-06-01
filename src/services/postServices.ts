@@ -1,6 +1,12 @@
 import { Schema, model, Error } from 'mongoose'
 
-import { CreatePost, EditPost, Post } from '@interfaces/postInterfaces'
+import {
+  CreatePost,
+  EditPost,
+  Post,
+  QueryPost,
+  QueryPosts
+} from '@interfaces/postInterfaces'
 
 const postSchema = new Schema<Post>({
   title: { type: String, required: true, unique: true },
@@ -8,7 +14,8 @@ const postSchema = new Schema<Post>({
   excerpt: { type: String, required: true },
   seoTitle: { type: String },
   seoDescription: { type: String },
-  author: { type: Schema.Types.ObjectId, ref: 'User' }
+  author: { type: Schema.Types.ObjectId, ref: 'User' },
+  content: { type: String, required: true }
 })
 
 const PostModel = model<Post>('Post', postSchema)
@@ -23,9 +30,9 @@ export const createPost = async (post: CreatePost) => {
   }
 }
 
-export const getPost = async (id: string) => {
+export const getPost = async (query: QueryPost) => {
   try {
-    const post = await PostModel.findById(id)
+    const post = await PostModel.findOne(query)
     if (!post) {
       throw new Error("Post doesn't exist")
     }
@@ -35,21 +42,18 @@ export const getPost = async (id: string) => {
   }
 }
 
-export const getPosts = async (filter: any) => {
+export const getPosts = async (query: QueryPosts) => {
   try {
-    const posts = await PostModel.find(filter)
-    if (!posts) {
-      throw new Error('Unable to get the list of posts')
-    }
+    const posts = await PostModel.find(query)
     return posts
   } catch (error) {
     throw new Error(error.message)
   }
 }
 
-export const editPost = async (id: string, data: EditPost) => {
+export const editPost = async (query: QueryPost, postData: EditPost) => {
   try {
-    const editedPost = await PostModel.findOneAndUpdate({ _id: id }, data, {
+    const editedPost = await PostModel.findOneAndUpdate(query, postData, {
       new: true
     })
     if (!editedPost) {
@@ -61,8 +65,8 @@ export const editPost = async (id: string, data: EditPost) => {
   }
 }
 
-export const deletePost = async (id: string) => {
-  const deletedPost = await PostModel.findOneAndDelete({ _id: id })
+export const deletePost = async (query: QueryPost) => {
+  const deletedPost = await PostModel.findOneAndDelete(query)
   if (!deletedPost) {
     throw new Error("Post doesn't exist")
   }

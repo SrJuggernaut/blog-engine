@@ -1,6 +1,5 @@
 import Joi from 'joi'
 import { ObjectId } from 'mongoose'
-import { User } from './userInterfaces'
 
 export interface Post {
   id: ObjectId
@@ -9,7 +8,8 @@ export interface Post {
   excerpt: string
   seoTitle?: string
   seoDescription?: string
-  author: User | ObjectId | string
+  author: ObjectId | string
+  content: string
 }
 
 export interface CreatePost {
@@ -19,6 +19,7 @@ export interface CreatePost {
   seoTitle?: Post['seoTitle']
   seoDescription?: Post['seoDescription']
   author: Post['author']
+  content: Post['content']
 }
 
 export interface EditPost {
@@ -28,10 +29,15 @@ export interface EditPost {
   seoTitle?: Post['seoTitle']
   seoDescription?: Post['seoDescription']
   author?: Post['author']
+  content?: Post['content']
 }
 
 export interface QueryPost {
-  author: User | ObjectId | string
+  _id?: string
+}
+
+export interface QueryPosts {
+  author?: string | ObjectId
 }
 
 export const postSchema = Joi.object({
@@ -49,7 +55,8 @@ export const postSchema = Joi.object({
   author: Joi.string()
     .alphanum()
     .pattern(/^[a-f\d]{24}$/i)
-    .required()
+    .required(),
+  content: Joi.string().required()
 })
 
 export const createPostSchema = Joi.object({
@@ -67,7 +74,8 @@ export const createPostSchema = Joi.object({
   author: Joi.string()
     .alphanum()
     .pattern(/^[a-f\d]{24}$/i)
-    .required()
+    .required(),
+  content: Joi.string().required()
 })
 
 export const editPostSchema = Joi.object({
@@ -81,13 +89,24 @@ export const editPostSchema = Joi.object({
   excerpt: Joi.string(),
   seoTitle: Joi.string(),
   seoDescription: Joi.string(),
-  author: Joi.string().pattern(/^[a-f\d]{24}$/i)
-}).min(1).messages({
-  'object.min': '"post" must have at least 1 key to edit'
+  author: Joi.string().pattern(/^[a-f\d]{24}$/i),
+  content: Joi.string()
 })
+  .min(1)
+  .messages({
+    'object.min': '"post" must have at least 1 key to edit'
+  })
 
 export const queryPostSchema = Joi.object({
+  id: Joi.string()
+    .alphanum()
+    .pattern(/^[a-f\d]{24}$/i)
+    .required()
+})
+
+export const queryPostsSchema = Joi.object({
   author: Joi.string()
     .alphanum()
     .pattern(/^[a-f\d]{24}$/i)
+    .required()
 })

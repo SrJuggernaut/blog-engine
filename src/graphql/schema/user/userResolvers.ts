@@ -1,21 +1,8 @@
 import { ForbiddenError, UserInputError } from 'apollo-server'
 import { Error } from 'mongoose'
-import {
-  UserRegister,
-  UserEdit,
-  userRegisterSchema,
-  userLoginSchema,
-  UserLogin,
-  userEditSchema
-} from '@interfaces/userInterfaces'
+import { UserEdit, userEditSchema } from '@interfaces/userInterfaces'
 import { getPosts } from '@services/postServices'
-import {
-  getUser,
-  register,
-  loginUser,
-  updateUser,
-  deleteUser
-} from '@services/userServices'
+import { getUser, updateUser, deleteUser } from '@services/userServices'
 
 const useResolvers = {
   Query: {
@@ -25,7 +12,7 @@ const useResolvers = {
         throw new ForbiddenError('You need to login to access')
       }
       try {
-        const res = await getUser(context.id)
+        const res = await getUser({ _id: context.id })
         return res
       } catch (error) {
         throw new Error(error.message)
@@ -33,34 +20,6 @@ const useResolvers = {
     }
   },
   Mutation: {
-    register: async (root: any, args: { user: UserRegister }, context: any) => {
-      const { error, value } = userRegisterSchema.validate(args.user)
-      if (error) {
-        throw new UserInputError(error.message, {})
-      }
-      try {
-        const res = await register(value)
-        return res
-      } catch (error) {
-        throw new Error(error.message)
-      }
-    },
-    login: async (
-      root: any,
-      args: { credentials: UserLogin },
-      context: any
-    ) => {
-      const { error, value } = userLoginSchema.validate(args.credentials)
-      if (error) {
-        throw new UserInputError(error.message)
-      }
-      try {
-        const res = await loginUser(value)
-        return res
-      } catch (error) {
-        throw new Error(error.message)
-      }
-    },
     updateUser: async (
       root: any,
       args: { id: string; user: UserEdit },
@@ -73,23 +32,15 @@ const useResolvers = {
       if (!context.id || context.id !== args.id) {
         throw new ForbiddenError("You can't modify that user")
       }
-      try {
-        const res = await updateUser(args.id, value)
-        return res
-      } catch (error) {
-        throw new Error(error.message)
-      }
+      const res = await updateUser({ _id: args.id }, value)
+      return res
     },
     deleteUser: async (root: any, args: { id: string }, context: any) => {
       if (!context.id || context.id !== args.id) {
         throw new ForbiddenError("You can't delete that user")
       }
-      try {
-        const res = await deleteUser(args.id)
-        return res
-      } catch (error) {
-        throw new Error(error.message)
-      }
+      const res = await deleteUser({ _id: args.id })
+      return res
     }
   },
   User: {

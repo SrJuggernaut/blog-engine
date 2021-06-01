@@ -22,20 +22,16 @@ const postResolvers = {
       if (error) {
         throw new UserInputError(error.message)
       }
-      try {
-        const res = await getPosts(value)
-        return res
-      } catch (error) {
-        throw new Error(error.message)
-      }
+      const res = await getPosts(value)
+      return res
     },
-    post: async (root: any, args: { id: string }, context: any) => {
-      try {
-        const post = await getPost(args.id)
-        return post
-      } catch (error) {
-        throw new Error(error.message)
+    post: async (root: any, args: { id?: string }, context: any) => {
+      const { value, error } = queryPostSchema.validate(args)
+      if (error) {
+        throw new UserInputError(error.message)
       }
+      const post = await getPost({ _id: value.id })
+      return post
     }
   },
   Mutation: {
@@ -44,12 +40,8 @@ const postResolvers = {
       if (error) {
         throw new UserInputError(error.message)
       }
-      try {
-        const res = await createPost(value)
-        return res
-      } catch (error) {
-        throw new Error(error.message)
-      }
+      const res = await createPost(value)
+      return res
     },
     editPost: async (
       root: any,
@@ -57,20 +49,19 @@ const postResolvers = {
       context: any
     ) => {
       const { error, value } = editPostSchema.validate(args.post)
-      console.log(args.post)
+      if (error) {
+        throw new UserInputError(error.message)
+      }
+      const res = await editPost({ _id: args.id }, value)
+      return res
+    },
+    deletePost: async (root: any, args: { id: string }, context: any) => {
+      const { value, error } = queryPostSchema.validate(args.id)
       if (error) {
         throw new UserInputError(error.message)
       }
       try {
-        const res = await editPost(args.id, value)
-        return res
-      } catch (error) {
-        throw new Error(error.message)
-      }
-    },
-    deletePost: async (root: any, args: { id: string }, context: any) => {
-      try {
-        const res = await deletePost(args.id)
+        const res = await deletePost({ _id: value.id })
         return res
       } catch (error) {
         throw new Error(error.message)
@@ -79,7 +70,7 @@ const postResolvers = {
   },
   Post: {
     id: (post: any) => post.id.toString(),
-    author: (post: any) => getUser(post.author.toString())
+    author: (post: any) => getUser({ _id: post.author.toString() })
   }
 }
 
