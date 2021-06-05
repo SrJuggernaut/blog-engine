@@ -18,6 +18,7 @@ const postTypeDefs = `
     author: User
     content: String
     categories: [Category]
+    comments: [Comment]
   }
   input CreatePost {
     title: String!

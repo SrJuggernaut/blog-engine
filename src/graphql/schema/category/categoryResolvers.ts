@@ -20,7 +20,7 @@ const categoryResolvers = {
       }
       if (value.post) {
         const post = await getPost(value.post)
-        const categories = await getCategories({ _id: { $all: post.categories } })
+        const categories = await getCategories({ _id: post.categories })
         return categories
       }
       const categories = await getCategories({})

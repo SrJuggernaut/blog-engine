@@ -1,9 +1,10 @@
 import { LogInData, SignUpData, JWTPayload } from '@interfaces/authInterfaces'
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+import jwt, { TokenExpiredError } from 'jsonwebtoken'
 
 import { jwtSecret } from '@config/serverConfig'
 import { createUser, getUser } from './userServices'
+import { AuthenticationError } from 'apollo-server-errors'
 
 const SALT_ROUNDS = 10
 
@@ -40,6 +41,9 @@ export const verifyJWT = (token: string) => {
     const data = jwt.verify(token, jwtSecret) as JWTPayload
     return data
   } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      throw new AuthenticationError(`Session expired at ${error.expiredAt}`)
+    }
     throw new Error(error.message)
   }
 }

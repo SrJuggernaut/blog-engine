@@ -17,10 +17,11 @@ import {
 } from '@services/postServices'
 import { getUser } from '@services/userServices'
 import { getCategories } from '@services/categoryServices'
+import { getComments } from '@services/commentServices'
 
 const postResolvers = {
   Query: {
-    posts: async (root: any, args: { author?: string }, context: any) => {
+    posts: async (root: any, args: { author: string }, context: any) => {
       const { value, error } = queryPostsSchema.validate(args)
       if (error) {
         throw new UserInputError(error.message)
@@ -28,7 +29,7 @@ const postResolvers = {
       const res = await getPosts(value)
       return res
     },
-    post: async (root: any, args: { id?: string }, context: any) => {
+    post: async (root: any, args: { id: string }, context: any) => {
       const { value, error } = queryPostSchema.validate(args)
       if (error) {
         throw new UserInputError(error.message)
@@ -74,7 +75,8 @@ const postResolvers = {
   Post: {
     id: (post: Post) => post.id.toString(),
     author: (post: Post) => getUser({ _id: post.author.toString() }),
-    categories: (post: Post) => getCategories({ _id: { $all: post.categories } })
+    categories: async (post: Post) => await getCategories({ _id: post.categories }),
+    comments: async (post: Post) => await getComments({ post: post.id.toString() })
   }
 }
 

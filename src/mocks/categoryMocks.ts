@@ -3,7 +3,7 @@ import faker from 'faker'
 faker.locale = 'es'
 
 export const generateCategory = () => {
-  class Post {
+  class Category {
     id: string = '1'
     title: string = faker.lorem.sentence()
     slug: string = faker.lorem.slug()
@@ -11,7 +11,5 @@ export const generateCategory = () => {
     seoTitle?: string = faker.lorem.sentence()
     seoDescription?: string = faker.lorem.paragraph()
   }
-  return new Post()
+  return new Category()
 }
-
-console.log(generateCategory())

@@ -1,6 +1,8 @@
 import Joi from 'joi'
+import { ObjectId } from 'mongoose'
 
 export interface User {
+  id: ObjectId
   userName: string
   email: string
   password?: string
