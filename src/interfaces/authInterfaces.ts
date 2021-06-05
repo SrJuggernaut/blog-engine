@@ -13,6 +13,10 @@ export interface LogInData {
   password: string
 }
 
+export interface JWTPayload {
+  sub: string
+}
+
 export const signUpDataSchema = Joi.object({
   userName: Joi.string().alphanum().min(3).required(),
   email: Joi.string().email().required(),

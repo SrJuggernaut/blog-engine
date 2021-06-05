@@ -10,6 +10,7 @@ export interface Post {
   seoDescription?: string
   author: ObjectId | string
   content: string
+  categories: [ string | ObjectId ]
 }
 
 export interface CreatePost {
@@ -20,6 +21,7 @@ export interface CreatePost {
   seoDescription?: Post['seoDescription']
   author: Post['author']
   content: Post['content']
+  categories: ['categories']
 }
 
 export interface EditPost {
@@ -30,14 +32,7 @@ export interface EditPost {
   seoDescription?: Post['seoDescription']
   author?: Post['author']
   content?: Post['content']
-}
-
-export interface QueryPost {
-  _id?: string
-}
-
-export interface QueryPosts {
-  author?: string | ObjectId
+  categories: ['categories']
 }
 
 export const postSchema = Joi.object({
@@ -90,11 +85,16 @@ export const editPostSchema = Joi.object({
   seoTitle: Joi.string(),
   seoDescription: Joi.string(),
   author: Joi.string().pattern(/^[a-f\d]{24}$/i),
-  content: Joi.string()
+  content: Joi.string(),
+  categories: Joi.array().items(
+    Joi.string()
+      .alphanum()
+      .pattern(/^[a-f\d]{24}$/i)
+  )
 })
   .min(1)
   .messages({
-    'object.min': '"post" must have at least 1 key to edit'
+    'object.min': 'You must include at least 1 key to edit'
   })
 
 export const queryPostSchema = Joi.object({
@@ -108,5 +108,4 @@ export const queryPostsSchema = Joi.object({
   author: Joi.string()
     .alphanum()
     .pattern(/^[a-f\d]{24}$/i)
-    .required()
 })

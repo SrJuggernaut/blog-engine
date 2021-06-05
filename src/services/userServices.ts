@@ -1,6 +1,7 @@
-import { model, Schema } from 'mongoose'
-import { User, UserEdit, UserQuery } from '@interfaces/userInterfaces'
+import { model, Schema, FilterQuery, UpdateQuery } from 'mongoose'
+import { User } from '@interfaces/userInterfaces'
 import { SignUpData } from '@interfaces/authInterfaces'
+import { UserInputError } from 'apollo-server-errors'
 
 const userSchema = new Schema<User>({
   userName: { type: String, required: true, unique: true },
@@ -18,11 +19,14 @@ export const createUser = async (user: SignUpData) => {
     delete savedUser.password
     return savedUser
   } catch (error) {
+    if (error.code === 11000) {
+      throw new UserInputError(`${Object.keys(error.keyValue)[0]} is already in use`)
+    }
     throw new Error(error.message)
   }
 }
 
-export const getUser = async (query: UserQuery) => {
+export const getUser = async (query: FilterQuery<User>) => {
   try {
     const user = await UserModel.findOne(query)
     if (!user) {
@@ -35,7 +39,7 @@ export const getUser = async (query: UserQuery) => {
   }
 }
 
-export const updateUser = async (query: UserQuery, data: UserEdit) => {
+export const updateUser = async (query: FilterQuery<User>, data: UpdateQuery<User>) => {
   try {
     const updatedUser = await UserModel.findOneAndUpdate(query, data, {
       new: true
@@ -50,7 +54,7 @@ export const updateUser = async (query: UserQuery, data: UserEdit) => {
   }
 }
 
-export const deleteUser = async (query: UserQuery) => {
+export const deleteUser = async (query: FilterQuery<User>) => {
   try {
     const deletedUser = await UserModel.findOneAndDelete(query)
     if (!deletedUser) {

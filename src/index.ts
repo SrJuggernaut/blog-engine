@@ -11,8 +11,8 @@ const server = new ApolloServer({
   context: ({ req }) => {
     if (req.headers.authorization) {
       const token = req.headers.authorization || ''
-      const { id } = verifyJWT(token)
-      return { id }
+      const { sub } = verifyJWT(token)
+      return { id: sub }
     }
     return null
   }

@@ -1,21 +1,20 @@
-import { Schema, model, Error } from 'mongoose'
+import { Schema, model, Error, FilterQuery, UpdateQuery } from 'mongoose'
 
 import {
   CreatePost,
-  EditPost,
-  Post,
-  QueryPost,
-  QueryPosts
+  Post
 } from '@interfaces/postInterfaces'
+import { UserInputError } from 'apollo-server-errors'
 
 const postSchema = new Schema<Post>({
   title: { type: String, required: true, unique: true },
-  slug: { type: String, required: true },
+  slug: { type: String, required: true, unique: true },
   excerpt: { type: String, required: true },
   seoTitle: { type: String },
   seoDescription: { type: String },
   author: { type: Schema.Types.ObjectId, ref: 'User' },
-  content: { type: String, required: true }
+  content: { type: String, required: true },
+  categories: [{ type: Schema.Types.ObjectId, ref: 'Category' }]
 })
 
 const PostModel = model<Post>('Post', postSchema)
@@ -26,11 +25,14 @@ export const createPost = async (post: CreatePost) => {
     const savedPost = await newPost.save()
     return savedPost
   } catch (error) {
+    if (error.code === 11000) {
+      throw new UserInputError(`${Object.keys(error.keyValue)[0]} is already in use`)
+    }
     throw new Error(error.message)
   }
 }
 
-export const getPost = async (query: QueryPost) => {
+export const getPost = async (query: FilterQuery<Post>) => {
   try {
     const post = await PostModel.findOne(query)
     if (!post) {
@@ -42,7 +44,7 @@ export const getPost = async (query: QueryPost) => {
   }
 }
 
-export const getPosts = async (query: QueryPosts) => {
+export const getPosts = async (query: FilterQuery<Post>) => {
   try {
     const posts = await PostModel.find(query)
     return posts
@@ -51,7 +53,7 @@ export const getPosts = async (query: QueryPosts) => {
   }
 }
 
-export const editPost = async (query: QueryPost, postData: EditPost) => {
+export const editPost = async (query: FilterQuery<Post>, postData: UpdateQuery<Post>) => {
   try {
     const editedPost = await PostModel.findOneAndUpdate(query, postData, {
       new: true
@@ -65,7 +67,7 @@ export const editPost = async (query: QueryPost, postData: EditPost) => {
   }
 }
 
-export const deletePost = async (query: QueryPost) => {
+export const deletePost = async (query: FilterQuery<Post>) => {
   const deletedPost = await PostModel.findOneAndDelete(query)
   if (!deletedPost) {
     throw new Error("Post doesn't exist")

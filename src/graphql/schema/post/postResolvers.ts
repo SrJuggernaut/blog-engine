@@ -4,7 +4,9 @@ import {
   createPostSchema,
   EditPost,
   editPostSchema,
-  queryPostSchema
+  Post,
+  queryPostSchema,
+  queryPostsSchema
 } from '@interfaces/postInterfaces'
 import {
   createPost,
@@ -14,11 +16,12 @@ import {
   getPosts
 } from '@services/postServices'
 import { getUser } from '@services/userServices'
+import { getCategories } from '@services/categoryServices'
 
 const postResolvers = {
   Query: {
     posts: async (root: any, args: { author?: string }, context: any) => {
-      const { value, error } = queryPostSchema.validate(args)
+      const { value, error } = queryPostsSchema.validate(args)
       if (error) {
         throw new UserInputError(error.message)
       }
@@ -69,8 +72,9 @@ const postResolvers = {
     }
   },
   Post: {
-    id: (post: any) => post.id.toString(),
-    author: (post: any) => getUser({ _id: post.author.toString() })
+    id: (post: Post) => post.id.toString(),
+    author: (post: Post) => getUser({ _id: post.author.toString() }),
+    categories: (post: Post) => getCategories({ _id: { $all: post.categories } })
   }
 }
 

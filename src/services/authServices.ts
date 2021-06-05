@@ -1,9 +1,8 @@
-import { LogInData, SignUpData } from '@interfaces/authInterfaces'
+import { LogInData, SignUpData, JWTPayload } from '@interfaces/authInterfaces'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-import { jwtSecret } from '../config/serverConfig'
-import { JWTPayload } from '../interfaces/userInterfaces'
+import { jwtSecret } from '@config/serverConfig'
 import { createUser, getUser } from './userServices'
 
 const SALT_ROUNDS = 10
@@ -17,7 +16,7 @@ export const signUp = async (user: SignUpData) => {
 
 export const logIn = async (credentials: LogInData) => {
   const user: any = await getUser({ email: credentials.email })
-  user.token = generateJWT(user._id)
+  user.token = generateJWT({ sub: user._id.toString() })
   return user
 }
 

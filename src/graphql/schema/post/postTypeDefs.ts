@@ -17,6 +17,7 @@ const postTypeDefs = `
     seoDescription: String
     author: User
     content: String
+    categories: [Category]
   }
   input CreatePost {
     title: String!
@@ -26,6 +27,7 @@ const postTypeDefs = `
     seoDescription: String
     author: ID!
     content: String
+    categories: [ID]
   }
   input EditPost {
     title: String
@@ -35,6 +37,7 @@ const postTypeDefs = `
     seoDescription: String
     author: ID
     content: String
+    categories: [ID]
   }
 `
 
