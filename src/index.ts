@@ -1,29 +1,44 @@
-import { ApolloServer } from 'apollo-server'
+import { ApolloServer } from 'apollo-server-express'
+import express from 'express'
 import { environment, serverPort } from '@config/serverConfig'
-import { start } from '@lib/mongoLib'
+import { start as mongoStart } from '@lib/mongoLib'
 import schema from '@graphql/schema/schema'
+import cookieParser from 'cookie-parser'
 import { verifyJWT } from '@services/authServices'
+
+const app = express()
+
+mongoStart()
+
+app.use(cookieParser())
 
 const server = new ApolloServer({
   schema,
   tracing: environment === 'development',
   playground: environment === 'development',
-  context: ({ req }) => {
-    if (req.headers.authorization) {
-      const token = req.headers.authorization || ''
-      const { sub } = verifyJWT(token)
-      return { id: sub }
+  context: ({ req, res }) => {
+    const user = req.cookies.auth ? verifyJWT(req.cookies.auth) : null
+    return {
+      res,
+      user
     }
-    return null
+  },
+  formatResponse: (response, requestContext: any) => {
+    const {
+      res,
+      token
+    }: { res: express.Response; token?: string } = requestContext.context
+    if (token) {
+      res.cookie('auth', token, { httpOnly: environment !== 'development', secure: environment !== 'development' })
+    }
+    return response
   }
 })
 
-start()
+server.applyMiddleware({ app })
 
-server
-  .listen({
-    port: serverPort
-  })
-  .then(({ url }) => {
-    console.log(`🚀  Server ready at ${url}`)
-  })
+app.listen(serverPort, () => {
+  console.log(
+    `🚀 Server ready at: http://localhost:${serverPort}, Graphql started on path: ${server.graphqlPath}`
+  )
+})

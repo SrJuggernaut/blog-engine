@@ -10,7 +10,7 @@ export interface Post {
   seoDescription?: string
   author: ObjectId | string
   content: string
-  categories: [ string | ObjectId ]
+  categories: string[] | ObjectId[]
 }
 
 export interface CreatePost {
@@ -21,7 +21,7 @@ export interface CreatePost {
   seoDescription?: Post['seoDescription']
   author: Post['author']
   content: Post['content']
-  categories: ['categories']
+  categories: Post['categories']
 }
 
 export interface EditPost {

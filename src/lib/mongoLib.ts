@@ -1,6 +1,5 @@
 import { connect, connection } from 'mongoose'
 import {
-  environment,
   dbSrv,
   dbUser,
   dbPassword,
@@ -24,9 +23,6 @@ export const start = async () => {
       useCreateIndex: true,
       useFindAndModify: false
     })
-    if (environment === 'development') {
-      console.log('Successfully connected to MongoDB')
-    }
   } catch (error) {
     console.log(error)
   }

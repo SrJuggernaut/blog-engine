@@ -1,4 +1,4 @@
-import { ForbiddenError, UserInputError } from 'apollo-server'
+import { ForbiddenError, UserInputError } from 'apollo-server-errors'
 import { Error } from 'mongoose'
 import { UserEdit, userEditSchema } from '@interfaces/userInterfaces'
 import { getPosts } from '@services/postServices'
@@ -6,13 +6,13 @@ import { getUser, updateUser, deleteUser } from '@services/userServices'
 
 const useResolvers = {
   Query: {
-    me: async (root: any, args: any, context: { id: string }) => {
-      const { id } = context
+    me: async (root: any, args: any, context: { id: string, user: { sub?: string } }) => {
+      const { sub: id } = context.user
       if (!id) {
         throw new ForbiddenError('You need to login to access')
       }
       try {
-        const res = await getUser({ _id: context.id })
+        const res = await getUser({ _id: id })
         return res
       } catch (error) {
         throw new Error(error.message)

@@ -59,7 +59,7 @@ export const editPost = async (query: FilterQuery<Post>, postData: UpdateQuery<P
       new: true
     })
     if (!editedPost) {
-      throw new Error("Post doesn't exist")
+      throw new Error("Post doesn't exist or can't be edited")
     }
     return editedPost
   } catch (error) {
@@ -68,9 +68,13 @@ export const editPost = async (query: FilterQuery<Post>, postData: UpdateQuery<P
 }
 
 export const deletePost = async (query: FilterQuery<Post>) => {
-  const deletedPost = await PostModel.findOneAndDelete(query)
-  if (!deletedPost) {
-    throw new Error("Post doesn't exist")
+  try {
+    const deletedPost = await PostModel.findOneAndDelete(query)
+    if (!deletedPost) {
+      throw new Error("Post doesn't exist")
+    }
+    return deletedPost
+  } catch (error) {
+    throw new Error(error.message)
   }
-  return deletedPost
 }

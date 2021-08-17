@@ -8,7 +8,7 @@ import {
   dbHost,
   dbAuthSource,
   dbPort
-} from './serverConfig'
+} from '@config/serverConfig'
 
 describe('Test env variables', () => {
   test('environment to be "test"', () => {

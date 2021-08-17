@@ -27,7 +27,6 @@ export const createCategory = async (category: CreateCategory) => {
 
 export const getCategory = async (query: FilterQuery<Category>) => {
   try {
-    console.log(categorySchema)
     const category = await CategoryModel.findOne(query)
     if (!category) {
       throw new Error("Category doesn't exist")
@@ -52,6 +51,9 @@ export const editCategory = async (query: FilterQuery<Category>, data: UpdateQue
     const editedCategory = await CategoryModel.findOneAndUpdate(query, data, {
       new: true
     })
+    if (!editedCategory) {
+      throw new UserInputError("Category doesn't exist or can't be edited")
+    }
     return editedCategory
   } catch (error) {
     throw new Error(error.message)
@@ -61,6 +63,9 @@ export const editCategory = async (query: FilterQuery<Category>, data: UpdateQue
 export const deleteCategory = async (query: FilterQuery<Category>) => {
   try {
     const deletedCategory = await CategoryModel.findOneAndDelete(query)
+    if (!deletedCategory) {
+      throw new UserInputError("Category doesn't exist")
+    }
     return deletedCategory
   } catch (error) {
     throw new Error(error.message)

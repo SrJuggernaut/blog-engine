@@ -1,10 +1,10 @@
 import { LogInData, SignUpData, JWTPayload } from '@interfaces/authInterfaces'
+import { AuthenticationError } from 'apollo-server-errors'
 import bcrypt from 'bcrypt'
 import jwt, { TokenExpiredError } from 'jsonwebtoken'
 
 import { jwtSecret } from '@config/serverConfig'
 import { createUser, getUser } from './userServices'
-import { AuthenticationError } from 'apollo-server-errors'
 
 const SALT_ROUNDS = 10
 
@@ -12,12 +12,21 @@ export const signUp = async (user: SignUpData) => {
   user.password = await generateHash(user.password)
   const signedUpUser = await createUser(user)
   signedUpUser.token = generateJWT(signedUpUser._id)
+  delete signedUpUser.password
   return signedUpUser
 }
 
 export const logIn = async (credentials: LogInData) => {
   const user: any = await getUser({ email: credentials.email })
+  if (!user) {
+    throw new AuthenticationError("That password / email combination doesn't exist")
+  }
+  const passwordMatch = await compareHash(credentials.password, user.password)
+  if (!passwordMatch) {
+    throw new AuthenticationError("That password / email combination doesn't exist")
+  }
   user.token = generateJWT({ sub: user._id.toString() })
+  delete user.password
   return user
 }
 
@@ -32,7 +41,7 @@ export const compareHash = async (password: string, hash: string) => {
 }
 
 export const generateJWT = (data: any) => {
-  const token = jwt.sign({ ...data }, jwtSecret, { expiresIn: 604800 })
+  const token = jwt.sign({ ...data }, jwtSecret, { expiresIn: 7200 })
   return token
 }
 

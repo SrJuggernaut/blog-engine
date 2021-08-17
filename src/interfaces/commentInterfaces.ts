@@ -12,7 +12,7 @@ export interface Comment {
 }
 
 export interface CreateComment {
-  username: Comment['userName']
+  userName: Comment['userName']
   email: Comment['email']
   content: Comment['content']
   post: Comment['post']

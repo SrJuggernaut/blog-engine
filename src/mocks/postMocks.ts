@@ -11,7 +11,8 @@ export const generatePost = () => {
     seoTitle?: string = faker.lorem.sentence()
     seoDescription?: string = faker.lorem.paragraph()
     author: string = ''
-    content?: string = faker.lorem.paragraphs()
+    content: string = faker.lorem.paragraphs()
+    categories: Array<string> = []
   }
   return new Post()
 }
